@@ -1,0 +1,23 @@
+node_modules/
+dist/
+*.js.map
+*.d.ts
+!vitest.config.ts
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# App data (never commit user data)
+.rationalizer/
