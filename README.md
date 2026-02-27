@@ -2,7 +2,7 @@
 
 **A Stoic AI journal that teaches you to think clearly when life hits hard.**
 
-Rationalizer is a terminal-based therapist powered by Rational Emotive Behavior Therapy (REBT) — the oldest and most battle-tested form of cognitive behavioral therapy. It walks you through a structured framework for dismantling irrational beliefs, then drops you into a Socratic dialogue with an AI that remembers your patterns across sessions.
+Rationalizer is a terminal-based therapist powered by Rational Emotive Behavior Therapy (REBT), the oldest and most battle-tested form of cognitive behavioral therapy. It walks you through a structured framework for dismantling irrational beliefs, then drops you into a Socratic dialogue with an AI that remembers your patterns across sessions.
 
 Your data stays on your machine. Encrypted. No cloud required.
 
@@ -14,24 +14,23 @@ npm install -g rationalizer
 
 ## Why REBT
 
-In 1955, Albert Ellis created Rational Emotive Behavior Therapy — the original cognitive behavioral therapy, a decade before Beck's CBT existed. Ellis didn't invent the core idea. He borrowed it from the Stoics.
+In 1955, Albert Ellis created REBT, the original cognitive behavioral therapy. A decade before Beck's CBT. Ellis didn't invent the core idea. He borrowed it from the Stoics.
 
-Epictetus, writing in 135 AD: *"Men are disturbed not by things, but by the views which they take of them."*
+Epictetus, 135 AD: *"Men are disturbed not by things, but by the views which they take of them."*
 
-That's the entire theory. Bad events don't cause your suffering — your **beliefs** about those events do. Specifically, your irrational demands: "This **must** not happen," "I **should** be better," "They **have** to treat me fairly." REBT teaches you to find these demands and replace them with preferences. Not suppression. Not positive thinking. Rational flexibility.
+That's the entire theory. Bad events don't cause your suffering. Your **beliefs** about those events do. Specifically, your irrational demands: "This **must** not happen," "I **should** be better," "They **have** to treat me fairly." REBT teaches you to find these demands and replace them with preferences. Not suppression. Not positive thinking. Rational flexibility.
 
-### The research backs it up
+### The research
 
-REBT has 70 years of clinical evidence behind it:
+70 years of clinical evidence:
 
-- **David et al. (2018)** — Meta-analysis of 84 studies across 50 years. Significant effect sizes for outcomes (d=0.58) and belief change (d=0.70), with effects sustained at follow-up. Conclusion: REBT is "a sound psychological intervention." ([Journal of Clinical Psychology](https://pmc.ncbi.nlm.nih.gov/articles/PMC5836900/))
-- **Lyons & Woods (1991)** — 27 studies, pre-post effect size of d=1.37. ([Clinical Psychology Review](https://www.sciencedirect.com/science/article/abs/pii/0272735891901139))
-- **King et al. (2024)** — Systematic review of 162 REBT intervention studies. Medium-to-large effects across behavioral, cognitive, emotional, and health outcomes. ([PLOS ONE](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0306835))
-- **David et al. (2008)** — RCT with 170 patients: REBT matched both cognitive therapy and pharmacotherapy for major depressive disorder. ([Journal of Clinical Psychology](https://onlinelibrary.wiley.com/doi/abs/10.1002/jclp.20487))
+- **David et al. (2018)** — Meta-analysis of 84 studies. Significant effect sizes for outcomes (d=0.58) and belief change (d=0.70), sustained at follow-up. ([Journal of Clinical Psychology](https://pmc.ncbi.nlm.nih.gov/articles/PMC5836900/))
+- **King et al. (2024)** — 162 REBT intervention studies. Medium-to-large effects across behavioral, cognitive, emotional, and health outcomes. ([PLOS ONE](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0306835))
+- **David et al. (2008)** — RCT, 170 patients: REBT matched cognitive therapy and pharmacotherapy for major depression. ([Journal of Clinical Psychology](https://onlinelibrary.wiley.com/doi/abs/10.1002/jclp.20487))
 
 Demonstrated effective for depression, anxiety, PTSD, OCD, anger, substance use, and performance contexts.
 
-### How it works: the ABCDE model
+### The ABCDE model
 
 Every session walks you through five steps:
 
@@ -51,9 +50,15 @@ The structured writing alone is therapeutic. The AI conversation that follows de
 
 ### AI therapist that learns about you
 
-After each journal entry, you enter a Socratic dialogue with an AI trained in the Albert Ellis tradition — warm, direct, and curious. It asks questions rather than lectures. It challenges your "musts" and "shoulds" gently.
+After each journal entry, you enter a Socratic dialogue with an AI trained in the Albert Ellis tradition. Warm, direct, and curious. It asks questions rather than lectures. It challenges your "musts" and "shoulds" gently.
 
-The AI extracts memories from each session — personal details, recurring patterns, breakthroughs, themes — and carries them forward. By your tenth session, it knows your tendencies. By your thirtieth, it catches patterns you don't see yourself.
+The AI extracts memories from each session (personal details, recurring patterns, breakthroughs, themes) and carries them forward. By your tenth session, it knows your tendencies. By your thirtieth, it catches patterns you don't see yourself.
+
+### Latin and Ancient Greek
+
+REBT descends directly from Stoic philosophy. Rationalizer honors that lineage. Switch the interface to Classical Latin (Senecan register) or polytonic Ancient Greek (in the style of Epictetus). The AI responds in that language too, using authentic Stoic terminology: *opiniones* for beliefs, *disputatio* for disputation, *δόξαι* for judgments, *ἔλεγχος* for examination.
+
+Settings > Language.
 
 ### Local-first, encrypted by default
 
@@ -69,7 +74,7 @@ All data lives in `~/.rationalizer/data.db`. Journal entries, conversations, and
 
 ### Vim mode
 
-Press `Ctrl+G` during any journal prompt to open your `$EDITOR`. Write long-form entries in vim, emacs, or whatever you use. The app picks up your text when you save and quit.
+Press `Ctrl+G` during any journal prompt to open your `$EDITOR`. Write long-form entries in vim, emacs, or whatever you use.
 
 ---
 
@@ -77,7 +82,6 @@ Press `Ctrl+G` during any journal prompt to open your `$EDITOR`. Write long-form
 
 ```bash
 npm install -g rationalizer
-rationalizer
 ```
 
 From source:
@@ -89,12 +93,20 @@ npm install
 npm run dev
 ```
 
-The setup wizard handles AI provider and encryption configuration on first run.
+## Usage
+
+```bash
+rationalizer
+```
+
+First run → setup wizard (AI provider, encryption passphrase). Every run after that → straight to journaling.
+
+`Ctrl+G` opens vim mid-prompt. Main menu has settings, past entries, and stats.
 
 ## Privacy
 
-- **With Ollama**: Zero network traffic. Everything runs locally.
-- **With Claude**: Only journal content is sent to the Anthropic API over HTTPS. Encrypted at rest.
+- **Ollama**: Zero network traffic. Everything runs locally.
+- **Claude**: Only journal content is sent to the Anthropic API over HTTPS. Encrypted at rest.
 - **No telemetry. No analytics. No tracking.**
 
 ## Development

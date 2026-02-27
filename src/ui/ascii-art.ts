@@ -1,5 +1,6 @@
 import { sleep } from '../utils/sleep.js';
 import { colors } from './theme.js';
+import { t } from '../i18n/index.js';
 
 const COLUMN = `  .-----...-----.
  / .-._______.-. \\
@@ -34,7 +35,7 @@ export function getParthenon(): string {
 
 export async function animateLevelUp(levelName: string, title: string): Promise<void> {
   console.log();
-  console.log(colors.primary(`  ▲ Level up — ${levelName}, ${title}`));
+  console.log(colors.primary(`  ${t().levelUp(levelName, title)}`));
   console.log();
   await sleep(1500);
 }

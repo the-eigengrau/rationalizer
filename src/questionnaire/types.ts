@@ -83,6 +83,7 @@ export interface LevelInfo {
 
 export type AIProvider = 'anthropic' | 'ollama' | 'none';
 export type EncryptionMode = 'cached' | 'always' | 'none';
+export type Language = 'en' | 'la' | 'grc';
 
 export interface AppConfig {
   version: number;
@@ -102,7 +103,7 @@ export interface AppConfig {
     ollamaUrl: string;
   };
   preferences: {
-    showTips: boolean;
     animationsEnabled: boolean;
+    language: Language;
   };
 }

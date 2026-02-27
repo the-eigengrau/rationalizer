@@ -1,4 +1,5 @@
 import type { LevelInfo } from '../questionnaire/types.js';
+import { t } from '../i18n/index.js';
 
 export const LEVELS: LevelInfo[] = [
   { requiredDays: 0,   name: 'Neophyte',      title: 'The Beginner',       description: 'The journey begins',        icon: '○' },
@@ -46,4 +47,12 @@ export function getLevelProgress(totalDays: number): { current: LevelInfo; next:
   const progress = Math.min(progressMade / progressRange, 1);
 
   return { current, next, progress };
+}
+
+export function getLocalizedTitle(name: string): string {
+  return t().levels.titles[name] ?? name;
+}
+
+export function getLocalizedDescription(name: string): string {
+  return t().levels.descriptions[name] ?? name;
 }

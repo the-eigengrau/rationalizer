@@ -1,4 +1,5 @@
 import type { REBTEntry, Memory } from '../questionnaire/types.js';
+import { t } from '../i18n/index.js';
 
 export function buildSystemPrompt(memories: Memory[], recentSummaries: string[]): string {
   const isFirstSession = memories.length === 0 && recentSummaries.length === 0;
@@ -69,25 +70,32 @@ This is the person's very first session. You have no prior history with them. We
     }
   }
 
+  // Language instruction
+  const langInstruction = t().ai.languageInstruction;
+  if (langInstruction) {
+    prompt += langInstruction;
+  }
+
   return prompt;
 }
 
 export function buildEntryMessage(entry: REBTEntry): string {
-  return `Here's my REBT journal entry for today:
+  const labels = t().ai.entryLabels;
+  return `${t().ai.entryIntro}
 
-**Activating Event:** ${entry.activatingEvent}
+**${labels.activatingEvent}:** ${entry.activatingEvent}
 
-**Emotions:** ${entry.emotionBefore} (intensity: ${entry.emotionIntensity}/100)
+**${labels.emotions}:** ${entry.emotionBefore} (${labels.intensity}: ${entry.emotionIntensity}/100)
 
-**Beliefs:** ${entry.beliefs}
+**${labels.beliefs}:** ${entry.beliefs}
 
-**Consequences:** ${entry.consequences}
+**${labels.consequences}:** ${entry.consequences}
 
-**Disputation:** ${entry.disputation}
+**${labels.disputation}:** ${entry.disputation}
 
-**Effective New Philosophy:** ${entry.effectiveNewPhilosophy}
+**${labels.newPhilosophy}:** ${entry.effectiveNewPhilosophy}
 
-**How I Feel After:** ${entry.emotionAfter}`;
+**${labels.emotionAfter}:** ${entry.emotionAfter}`;
 }
 
 export function buildMemoryExtractionPrompt(existingMemories: Memory[]): string {

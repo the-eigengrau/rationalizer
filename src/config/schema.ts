@@ -18,8 +18,8 @@ export const configSchema = z.object({
     ollamaUrl: z.string().default('http://localhost:11434'),
   }),
   preferences: z.object({
-    showTips: z.boolean().default(true),
     animationsEnabled: z.boolean().default(true),
+    language: z.enum(['en', 'la', 'grc']).default('en'),
   }),
 });
 

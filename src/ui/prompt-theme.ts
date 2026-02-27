@@ -8,4 +8,5 @@ export const promptTheme = {
     highlight: (text: string) => colors.primary(text),
   },
   keybindings: ['vim' as const],
+  helpMode: 'never' as const,
 };

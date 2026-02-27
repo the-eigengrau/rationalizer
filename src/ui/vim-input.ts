@@ -3,6 +3,7 @@ import { spawnSync } from 'node:child_process';
 import { writeFileSync, readFileSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+import { randomUUID } from 'node:crypto';
 import { colors } from './theme.js';
 import { promptTheme } from './prompt-theme.js';
 
@@ -44,8 +45,11 @@ export async function vimInput(opts: VimInputOptions): Promise<string> {
           validate: opts.validate,
           transformer: (value: string, { isFinal }: { isFinal: boolean }) => {
             if (!value && !isFinal && !hasKeypress) {
-              const placeholder = 'ctrl+g for vim';
-              return colors.subtle(placeholder) + `\x1b[${placeholder.length}D`;
+              process.nextTick(() => {
+                const hint = 'ctrl+g for vim';
+                process.stdout.write(`${colors.subtle(hint)}\x1b[${hint.length}D`);
+              });
+              return '';
             }
             return value;
           },
@@ -79,8 +83,8 @@ export async function vimInput(opts: VimInputOptions): Promise<string> {
 
 function openInEditor(): string {
   const editor = process.env.EDITOR || process.env.VISUAL || 'vim';
-  const tmpFile = join(tmpdir(), `rationalizer-${Date.now()}.txt`);
-  writeFileSync(tmpFile, '', 'utf-8');
+  const tmpFile = join(tmpdir(), `rationalizer-${randomUUID()}.txt`);
+  writeFileSync(tmpFile, '', { encoding: 'utf-8', mode: 0o600 });
 
   spawnSync(editor, [tmpFile], { stdio: 'inherit' });
 

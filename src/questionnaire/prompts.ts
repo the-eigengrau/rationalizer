@@ -2,28 +2,29 @@ import { number } from '@inquirer/prompts';
 import { colors } from '../ui/theme.js';
 import { promptTheme } from '../ui/prompt-theme.js';
 import { vimInput } from '../ui/vim-input.js';
+import { t } from '../i18n/index.js';
 
 export async function promptActivatingEvent(): Promise<string> {
-  console.log(colors.white('\n  Activating Event'));
-  console.log(colors.dim('  Describe the situation that triggered your emotional response.'));
+  console.log(colors.white(`\n  ${t().prompts.activatingEvent.title}`));
+  console.log(colors.dim(`  ${t().prompts.activatingEvent.description}`));
 
   return vimInput({
-    validate: (val) => val.trim().length > 0 || 'Please describe what happened.',
+    validate: (val) => val.trim().length > 0 || t().prompts.activatingEvent.validation,
   });
 }
 
 export async function promptEmotionBefore(): Promise<string> {
-  console.log(colors.white('\n  Emotional Response'));
-  console.log(colors.dim('  What emotions did you feel? e.g., anxious, angry, sad, guilty.'));
+  console.log(colors.white(`\n  ${t().prompts.emotionBefore.title}`));
+  console.log(colors.dim(`  ${t().prompts.emotionBefore.description}`));
 
   return vimInput({
-    validate: (val) => val.trim().length > 0 || 'Please describe your emotions.',
+    validate: (val) => val.trim().length > 0 || t().prompts.emotionBefore.validation,
   });
 }
 
 export async function promptEmotionIntensity(): Promise<number> {
-  console.log(colors.white('\n  Intensity'));
-  console.log(colors.dim('  How intense was the emotion? (1-100)'));
+  console.log(colors.white(`\n  ${t().prompts.emotionIntensity.title}`));
+  console.log(colors.dim(`  ${t().prompts.emotionIntensity.description}`));
 
   const result = await number({
     message: '',
@@ -36,46 +37,46 @@ export async function promptEmotionIntensity(): Promise<number> {
 }
 
 export async function promptBeliefs(): Promise<string> {
-  console.log(colors.white('\n  Beliefs'));
-  console.log(colors.dim('  What were you telling yourself? Look for demands: must, should, have to.'));
+  console.log(colors.white(`\n  ${t().prompts.beliefs.title}`));
+  console.log(colors.dim(`  ${t().prompts.beliefs.description}`));
 
   return vimInput({
-    validate: (val) => val.trim().length > 0 || 'Please describe your beliefs.',
+    validate: (val) => val.trim().length > 0 || t().prompts.beliefs.validation,
   });
 }
 
 export async function promptConsequences(): Promise<string> {
-  console.log(colors.white('\n  Consequences'));
-  console.log(colors.dim('  How did you act? What did you do or avoid doing?'));
+  console.log(colors.white(`\n  ${t().prompts.consequences.title}`));
+  console.log(colors.dim(`  ${t().prompts.consequences.description}`));
 
   return vimInput({
-    validate: (val) => val.trim().length > 0 || 'Please describe the consequences.',
+    validate: (val) => val.trim().length > 0 || t().prompts.consequences.validation,
   });
 }
 
 export async function promptDisputation(): Promise<string> {
-  console.log(colors.white('\n  Disputation'));
-  console.log(colors.dim('  Challenge your beliefs. Where is the evidence?'));
+  console.log(colors.white(`\n  ${t().prompts.disputation.title}`));
+  console.log(colors.dim(`  ${t().prompts.disputation.description}`));
 
   return vimInput({
-    validate: (val) => val.trim().length > 0 || 'Please try to dispute your beliefs.',
+    validate: (val) => val.trim().length > 0 || t().prompts.disputation.validation,
   });
 }
 
 export async function promptEffectiveNewPhilosophy(): Promise<string> {
-  console.log(colors.white('\n  Effective New Philosophy'));
-  console.log(colors.dim('  Turn your demands into preferences. What is a healthier perspective?'));
+  console.log(colors.white(`\n  ${t().prompts.newPhilosophy.title}`));
+  console.log(colors.dim(`  ${t().prompts.newPhilosophy.description}`));
 
   return vimInput({
-    validate: (val) => val.trim().length > 0 || 'Please describe a new perspective.',
+    validate: (val) => val.trim().length > 0 || t().prompts.newPhilosophy.validation,
   });
 }
 
 export async function promptEmotionAfter(): Promise<string> {
-  console.log(colors.white('\n  After Reflection'));
-  console.log(colors.dim('  How do you feel now, after working through this?'));
+  console.log(colors.white(`\n  ${t().prompts.emotionAfter.title}`));
+  console.log(colors.dim(`  ${t().prompts.emotionAfter.description}`));
 
   return vimInput({
-    validate: (val) => val.trim().length > 0 || 'Please describe how you feel.',
+    validate: (val) => val.trim().length > 0 || t().prompts.emotionAfter.validation,
   });
 }

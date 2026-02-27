@@ -5,6 +5,7 @@ import { runConversation } from './conversation.js';
 import { summarizeEntry } from './prompt.js';
 import type { AppConfig } from '../questionnaire/types.js';
 import type { REBTEntry } from '../questionnaire/types.js';
+import { t } from '../i18n/index.js';
 
 export function createProvider(config: AppConfig): AIProvider | null {
   switch (config.ai.provider) {
@@ -32,7 +33,7 @@ export async function generateFarewell(config: AppConfig, entry: REBTEntry): Pro
   const provider = createProvider(config);
   if (!provider) return null;
 
-  const systemPrompt = `You generate a single concise Stoic-inspired one-liner to close a journaling session. The line should subtly reinforce the lesson from the person's reflection. No quotes, no attribution, no preamble — just the line itself. One sentence, maximum 15 words. Warm but grounded.`;
+  const systemPrompt = t().ai.farewellSystemPrompt;
 
   const summary = summarizeEntry(entry);
   const userMessage = `Here's what they worked through today:\n\n${summary}\n\nGenerate the closing one-liner.`;

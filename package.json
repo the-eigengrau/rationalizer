@@ -7,15 +7,27 @@
   "bin": {
     "rationalizer": "./dist/index.js"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "NODE_OPTIONS='--disable-warning=DEP0040' tsx src/index.ts",
     "build": "tsc",
+    "prepublishOnly": "npm run build",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "keywords": ["rebt", "journaling", "cbt", "therapy", "cli", "mental-health", "stoic"],
-  "author": "",
+  "author": "Ayon Bhattacharya",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/the-eigengrau/rationalizer.git"
+  },
+  "homepage": "https://github.com/the-eigengrau/rationalizer#readme",
+  "bugs": {
+    "url": "https://github.com/the-eigengrau/rationalizer/issues"
+  },
   "engines": {
     "node": ">=20.0.0"
   },

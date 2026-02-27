@@ -5,6 +5,7 @@ import { buildSystemPrompt, buildEntryMessage } from './prompt.js';
 import { loadMemories, loadRecentSummaries, extractAndSaveMemories } from './memory.js';
 import { saveConversation, generateId } from '../storage/index.js';
 import { colors } from '../ui/theme.js';
+import { t } from '../i18n/index.js';
 
 const THINKING_FRAMES = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
 const MAX_LINE_WIDTH = 72;
@@ -67,7 +68,7 @@ export async function runConversation(
 
   console.clear();
   console.log();
-  console.log(colors.dim('  /done to end'));
+  console.log(colors.dim(`  ${t().conversation.doneHint}`));
 
   // Get initial response
   await streamResponse(provider, messages, systemPrompt);
@@ -84,9 +85,9 @@ export async function runConversation(
       process.stdout.write(colors.dimWhite('\n  › '));
 
       const onLine = (line: string) => {
-        // Overwrite the › prompt with "You" label
+        // Overwrite the › prompt with "Me" label
         process.stdout.write(`\x1b[1A\x1b[2K`);
-        process.stdout.write(`  ${colors.dimWhite('Me')}\n  ${line}\n`);
+        process.stdout.write(`  ${colors.dimWhite(t().conversation.me)}\n  ${line}\n`);
         rl.removeListener('line', onLine);
         rl.removeListener('close', onClose);
         resolve(line);
@@ -153,7 +154,7 @@ async function streamResponse(
     fullResponse = await provider.chat(messages, systemPrompt, (text) => {
       if (firstToken) {
         thinking.stop();
-        process.stdout.write(`\n  ${colors.dimWhite('Rationalizer')}\n  `);
+        process.stdout.write(`\n  ${colors.primary(t().conversation.rationalizer)}\n  `);
         col = 0;
         firstToken = false;
       }
@@ -177,7 +178,7 @@ async function streamResponse(
   } catch (error) {
     thinking.stop();
     const msg = error instanceof Error ? error.message : 'Unknown error';
-    console.log(colors.error(`  Error: ${msg}`));
+    console.log(colors.error(`  ${t().conversation.error(msg)}`));
     return;
   }
 

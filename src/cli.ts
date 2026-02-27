@@ -15,8 +15,9 @@ import { colors } from './ui/theme.js';
 import { promptTheme } from './ui/prompt-theme.js';
 import { animateSessionComplete } from './ui/celebration.js';
 import { getRecentEntries } from './storage/index.js';
-import { getRandomTip, getRandomTipRaw } from './ui/tips.js';
+import { getRandomTipRaw } from './ui/tips.js';
 import { sleep } from './utils/sleep.js';
+import { setLanguage, t } from './i18n/index.js';
 
 export async function main(): Promise<void> {
   let config: Config;
@@ -27,6 +28,7 @@ export async function main(): Promise<void> {
     config = loadConfig();
   }
 
+  setLanguage(config.preferences.language);
   await setupEncryption(config);
   getDb();
 
@@ -59,11 +61,12 @@ async function setupEncryption(config: Config): Promise<void> {
   console.log();
   console.log(colors.primary('  Rationalizer'));
   console.log();
+  console.log(colors.white(`  ${t().passphrase.enter}`));
 
   const passphrase = await passwordPrompt({
-    message: 'Enter your passphrase',
+    message: '',
     mask: '●',
-    theme: promptTheme,
+    theme: { ...promptTheme, prefix: { idle: '  ›', done: '  ›' } },
   });
 
   const key = deriveKey(passphrase, config.encryption.salt, config.encryption.iterations);
@@ -76,7 +79,7 @@ async function setupEncryption(config: Config): Promise<void> {
     }, key);
 
     if (!valid) {
-      console.log(colors.error('\n  Incorrect passphrase.\n'));
+      console.log(colors.error(`\n  ${t().passphrase.incorrect}\n`));
       process.exit(1);
     }
   }
@@ -105,11 +108,11 @@ async function mainMenuLoop(config: Config): Promise<void> {
       message: '',
       theme: { ...promptTheme, prefix: { idle: '', done: '' } },
       choices: [
-        { value: 'session', name: 'Begin session' },
-        { value: 'entries', name: 'Past entries' },
-        { value: 'stats', name: 'Stats & level' },
-        { value: 'settings', name: 'Settings' },
-        { value: 'exit', name: 'Exit' },
+        { value: 'session', name: t().menu.beginSession },
+        { value: 'entries', name: t().menu.pastEntries },
+        { value: 'stats', name: t().menu.statsAndLevel },
+        { value: 'settings', name: t().menu.settings },
+        { value: 'exit', name: t().menu.exit },
       ],
     });
 
@@ -189,4 +192,3 @@ async function showFarewell(config: Config): Promise<void> {
   await typewriter(tip, config.preferences.animationsEnabled);
   process.stdout.write('\n\n');
 }
-

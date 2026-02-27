@@ -5,12 +5,13 @@ import { colors, headerStyle, BOX_COLOR } from '../ui/theme.js';
 import { promptTheme } from '../ui/prompt-theme.js';
 import { formatDate } from '../utils/date.js';
 import type { REBTEntry } from '../questionnaire/types.js';
+import { t } from '../i18n/index.js';
 
 export async function viewPastEntries(): Promise<void> {
   const entries = listEntries(20);
 
   if (entries.length === 0) {
-    console.log(colors.dim('\n  No entries yet.\n'));
+    console.log(colors.dim(`\n  ${t().entries.noEntries}\n`));
     return;
   }
 
@@ -20,7 +21,7 @@ export async function viewPastEntries(): Promise<void> {
       name: `${colors.dim(formatDate(entry.createdAt))}  ${entry.emotionBefore}  ${colors.dim(`(${entry.emotionIntensity}/100)`)}`,
     }));
 
-    choices.push({ value: '__back', name: colors.dim('← Back') });
+    choices.push({ value: '__back', name: colors.dim(t().common.back) });
 
     const chosen = await select({
       message: '',
@@ -37,9 +38,9 @@ export async function viewPastEntries(): Promise<void> {
 
       const convo = getConversation(entry.id);
       if (convo) {
-        console.log(colors.white('\n  Conversation\n'));
+        console.log(colors.white(`\n  ${t().entries.conversation}\n`));
         for (const msg of convo.messages) {
-          const label = msg.role === 'user' ? colors.white('You') : colors.primary('Rationalizer');
+          const label = msg.role === 'user' ? colors.white(t().entries.you) : colors.primary(t().entries.rationalizer);
           console.log(`  ${label}  ${colors.white(msg.content)}`);
           console.log();
         }
@@ -48,7 +49,7 @@ export async function viewPastEntries(): Promise<void> {
       await select({
         message: '',
         theme: { ...promptTheme, prefix: { idle: '', done: '' } },
-        choices: [{ value: 'back', name: colors.dim('← Back') }],
+        choices: [{ value: 'back', name: colors.dim(t().common.back) }],
       });
     }
   }
@@ -58,21 +59,21 @@ function displayEntry(entry: REBTEntry): void {
   const content = [
     `${colors.dim(formatDate(entry.createdAt))}`,
     '',
-    `${colors.white('Activating Event')}`,
+    `${colors.white(t().entries.activatingEvent)}`,
     `${colors.dim(entry.activatingEvent)}`,
     '',
-    `${colors.white('Emotions')}  ${colors.dim(`${entry.emotionBefore} → ${entry.emotionAfter}`)}  ${colors.dim(`(${entry.emotionIntensity}/100)`)}`,
+    `${colors.white(t().entries.emotions)}  ${colors.dim(`${entry.emotionBefore} → ${entry.emotionAfter}`)}  ${colors.dim(`(${entry.emotionIntensity}/100)`)}`,
     '',
-    `${colors.white('Beliefs')}`,
+    `${colors.white(t().entries.beliefs)}`,
     `${colors.dim(entry.beliefs)}`,
     '',
-    `${colors.white('Consequences')}`,
+    `${colors.white(t().entries.consequences)}`,
     `${colors.dim(entry.consequences)}`,
     '',
-    `${colors.white('Disputation')}`,
+    `${colors.white(t().entries.disputation)}`,
     `${colors.dim(entry.disputation)}`,
     '',
-    `${colors.white('New Philosophy')}`,
+    `${colors.white(t().entries.newPhilosophy)}`,
     `${colors.dim(entry.effectiveNewPhilosophy)}`,
   ].join('\n');
 

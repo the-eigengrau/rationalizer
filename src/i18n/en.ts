@@ -1,0 +1,200 @@
+import type { Translations } from './types.js';
+
+export const en: Translations = {
+  menu: {
+    beginSession: 'Begin session',
+    pastEntries: 'Past entries',
+    statsAndLevel: 'Stats & level',
+    settings: 'Settings',
+    exit: 'Exit',
+  },
+
+  common: {
+    back: '← Back',
+    cancel: '← Cancel',
+    updated: 'Updated.',
+    deleted: 'Deleted.',
+  },
+
+  passphrase: {
+    enter: 'Enter your passphrase',
+    incorrect: 'Incorrect passphrase.',
+    choose: 'Choose a passphrase',
+    confirm: 'Confirm passphrase',
+    tooShort: 'At least 8 characters.',
+    mismatch: 'Passphrases do not match.',
+  },
+
+  settings: {
+    aiProvider: 'AI provider',
+    localAI: 'Local AI (Ollama)',
+    cloudAI: 'Cloud AI (Claude)',
+    noAI: 'No AI',
+    anthropicApiKey: 'Anthropic API key',
+    ollamaModel: 'Ollama model',
+    ollamaUrl: 'Ollama URL',
+    encryption: 'Encryption',
+    encryptionMode: 'Encryption mode',
+    cached: 'Cached (ask once, remember 1hr)',
+    alwaysAsk: 'Always ask',
+    noEncryption: 'No encryption',
+    encryptionStatus: { cached: 'on', always: 'on', none: 'off' },
+    newEntriesOnly: 'Only new entries will be encrypted.',
+    memories: 'Memories',
+    noMemories: 'No memories yet.',
+    deleteOne: 'Delete a memory',
+    deleteAll: 'Delete all',
+    select: 'Select',
+    deleteAllConfirm: 'Delete all memories? Cannot be undone.',
+    allDeleted: 'All memories deleted.',
+    preferences: 'Preferences',
+    enableAnimations: 'Enable animations?',
+    language: 'Language',
+    resetAllData: 'Reset all data',
+    resetConfirm: 'Delete all entries, conversations, and memories?',
+    dataCleared: 'Data cleared.',
+  },
+
+  entries: {
+    noEntries: 'No entries yet.',
+    activatingEvent: 'Activating Event',
+    emotions: 'Emotions',
+    beliefs: 'Beliefs',
+    consequences: 'Consequences',
+    disputation: 'Disputation',
+    newPhilosophy: 'New Philosophy',
+    conversation: 'Conversation',
+    you: 'You',
+    rationalizer: 'Rationalizer',
+  },
+
+  stats: {
+    streak: 'Streak',
+    longest: 'Longest',
+    entries: 'Entries',
+    days: 'Days',
+    maxLevel: 'Max level',
+    daysToLevel: (current, required, name) => `${current}/${required} days to ${name}`,
+  },
+
+  prompts: {
+    activatingEvent: {
+      title: 'Activating Event',
+      description: 'Describe the situation that triggered your emotional response.',
+      validation: 'Please describe what happened.',
+    },
+    emotionBefore: {
+      title: 'Emotional Response',
+      description: 'What emotions did you feel? e.g., anxious, angry, sad, guilty.',
+      validation: 'Please describe your emotions.',
+    },
+    emotionIntensity: {
+      title: 'Intensity',
+      description: 'How intense was the emotion? (1-100)',
+    },
+    beliefs: {
+      title: 'Beliefs',
+      description: 'What were you telling yourself? Look for demands: must, should, have to.',
+      validation: 'Please describe your beliefs.',
+    },
+    consequences: {
+      title: 'Consequences',
+      description: 'How did you act? What did you do or avoid doing?',
+      validation: 'Please describe the consequences.',
+    },
+    disputation: {
+      title: 'Disputation',
+      description: 'Challenge your beliefs. Where is the evidence?',
+      validation: 'Please try to dispute your beliefs.',
+    },
+    newPhilosophy: {
+      title: 'Effective New Philosophy',
+      description: 'Turn your demands into preferences. What is a healthier perspective?',
+      validation: 'Please describe a new perspective.',
+    },
+    emotionAfter: {
+      title: 'After Reflection',
+      description: 'How do you feel now, after working through this?',
+      validation: 'Please describe how you feel.',
+    },
+  },
+
+  tips: [
+    "You feel the way you think. Change your thinking, change your feeling.",
+    "There's a difference between wanting something and demanding it.",
+    "Unconditional self-acceptance: you are worthy regardless of performance.",
+    "Replace 'I must' with 'I prefer' - feel the difference.",
+    "Awfulizing makes bad situations feel catastrophic. Rate it on a real scale.",
+    "Low frustration tolerance says 'I can't stand it.' But you can - and you have.",
+    "Other people don't make you angry. Your beliefs about their behavior do.",
+    "Shoulding on yourself is the quickest path to misery.",
+    "Disputing irrational beliefs isn't positive thinking - it's realistic thinking.",
+    "The goal isn't to feel nothing. It's to feel appropriately.",
+    "You don't need approval to be worthwhile.",
+    "Humans are fallible. All of us. Including you. That's okay.",
+    "Discomfort is not the same as danger.",
+    "Your worth as a person is not determined by any single event.",
+    "Preferences lead to disappointment. Demands lead to disturbance.",
+    "Ask yourself: 'Where is the evidence for this belief?'",
+    "Albert Ellis: 'The best years of your life are the ones in which you decide your problems are your own.'",
+    "Emotional responsibility: nobody can upset you without your philosophical permission.",
+    "Practice unconditional other-acceptance: people will act the way they act.",
+    "The elegant solution: change the demand, not the world.",
+  ],
+
+  levels: {
+    titles: {
+      Neophyte: 'The Beginner',
+      Asketes: 'The Practitioner',
+      Philosophos: 'Lover of Wisdom',
+      Mathematikos: 'The Learner',
+      Dialektikos: 'Master of Reason',
+      Sophron: 'The Temperate One',
+      Ataraxos: 'The Unshakeable',
+      Sophos: 'The Sage',
+      Epistemon: 'The Knower',
+    },
+    descriptions: {
+      Neophyte: 'The journey begins',
+      Asketes: 'Discipline takes root',
+      Philosophos: 'The love of wisdom grows',
+      Mathematikos: 'Patterns emerge from chaos',
+      Dialektikos: 'Logic is your sword',
+      Sophron: 'Balance in all things',
+      Ataraxos: 'Inner peace achieved',
+      Sophos: 'Wisdom flows through you',
+      Epistemon: 'True knowledge attained',
+    },
+  },
+
+  streak: {
+    noActive: 'No active streak',
+    oneDay: '1 day',
+    nDays: (n) => `${n} days`,
+  },
+
+  conversation: {
+    doneHint: '/done to end',
+    me: 'Me',
+    rationalizer: 'Rationalizer',
+    error: (msg) => `Error: ${msg}`,
+  },
+
+  ai: {
+    languageInstruction: '',
+    farewellSystemPrompt: `You generate a single concise Stoic-inspired one-liner to close a journaling session. The line should subtly reinforce the lesson from the person's reflection. No quotes, no attribution, no preamble — just the line itself. One sentence, maximum 15 words. Warm but grounded.`,
+    entryIntro: "Here's my REBT journal entry for today:",
+    entryLabels: {
+      activatingEvent: 'Activating Event',
+      emotions: 'Emotions',
+      intensity: 'intensity',
+      beliefs: 'Beliefs',
+      consequences: 'Consequences',
+      disputation: 'Disputation',
+      newPhilosophy: 'Effective New Philosophy',
+      emotionAfter: 'How I Feel After',
+    },
+  },
+
+  levelUp: (name, title) => `▲ Level up — ${name}, ${title}`,
+};

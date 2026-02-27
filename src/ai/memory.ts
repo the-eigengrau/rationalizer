@@ -52,7 +52,7 @@ export async function extractAndSaveMemories(
     if (!Array.isArray(newMemories)) return;
 
     for (const mem of newMemories) {
-      if (mem.category && mem.content && ['personal', 'pattern', 'progress', 'theme'].includes(mem.category)) {
+      if (mem.category && mem.content && mem.content.length <= 500 && ['personal', 'pattern', 'progress', 'theme'].includes(mem.category)) {
         saveMemory({
           id: generateId(),
           createdAt: new Date().toISOString(),

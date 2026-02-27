@@ -8,7 +8,7 @@ let db: Database.Database | null = null;
 export function getDataDir(): string {
   const dir = path.join(os.homedir(), '.rationalizer');
   if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+    fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
   }
   return dir;
 }
