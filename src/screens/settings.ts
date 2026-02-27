@@ -100,12 +100,14 @@ async function configureEncryption(config: Config): Promise<Config> {
   if (mode !== 'none' && config.encryption.mode === 'none') {
     const passphrase = await password({
       message: 'Choose a passphrase',
+      mask: '●',
       theme: promptTheme,
       validate: (val) => val.length >= 8 || 'At least 8 characters.',
     });
 
     await password({
       message: 'Confirm passphrase',
+      mask: '●',
       theme: promptTheme,
       validate: (val) => val === passphrase || 'Passphrases do not match.',
     });

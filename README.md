@@ -1,29 +1,93 @@
 # Rationalizer
 
-An elegant CLI tool for **Rational Emotive Behavior Therapy (REBT)** journaling with AI feedback and gamification.
+**A Stoic AI journal that teaches you to think clearly when life hits hard.**
+
+Rationalizer is a terminal-based therapist powered by Rational Emotive Behavior Therapy (REBT) — the oldest and most battle-tested form of cognitive behavioral therapy. It walks you through a structured framework for dismantling irrational beliefs, then drops you into a Socratic dialogue with an AI that remembers your patterns across sessions.
+
+Your data stays on your machine. Encrypted. No cloud required.
 
 ```
-▄▖▄▖▄▖▄▖▄▖▖ ▖▄▖▖ ▄▖▄▖▄▖▄▖
-▙▘▌▌▐ ▐ ▌▌▛▖▌▌▌▌ ▐ ▗▘▙▖▙▘
-▌▌▛▌▐ ▟▖▙▌▌▝▌▛▌▙▖▟▖▙▖▙▖▌▌
+npm install -g rationalizer
 ```
 
-Rationalizer guides you through the **ABCDE model** — a structured approach to identifying and disputing irrational beliefs:
+---
 
-- **A**ctivating Event — What happened?
-- **B**eliefs — What were you telling yourself?
-- **C**onsequences — How did you feel and act?
-- **D**isputation — Challenge those beliefs
-- **E**ffective New Philosophy — A healthier perspective
+## Why REBT
+
+In 1955, Albert Ellis created Rational Emotive Behavior Therapy — the original cognitive behavioral therapy, a decade before Beck's CBT existed. Ellis didn't invent the core idea. He borrowed it from the Stoics.
+
+Epictetus, writing in 135 AD: *"Men are disturbed not by things, but by the views which they take of them."*
+
+That's the entire theory. Bad events don't cause your suffering — your **beliefs** about those events do. Specifically, your irrational demands: "This **must** not happen," "I **should** be better," "They **have** to treat me fairly." REBT teaches you to find these demands and replace them with preferences. Not suppression. Not positive thinking. Rational flexibility.
+
+### The research backs it up
+
+REBT has 70 years of clinical evidence behind it:
+
+- **David et al. (2018)** — Meta-analysis of 84 studies across 50 years. Significant effect sizes for outcomes (d=0.58) and belief change (d=0.70), with effects sustained at follow-up. Conclusion: REBT is "a sound psychological intervention." ([Journal of Clinical Psychology](https://pmc.ncbi.nlm.nih.gov/articles/PMC5836900/))
+- **Lyons & Woods (1991)** — 27 studies, pre-post effect size of d=1.37. ([Clinical Psychology Review](https://www.sciencedirect.com/science/article/abs/pii/0272735891901139))
+- **King et al. (2024)** — Systematic review of 162 REBT intervention studies. Medium-to-large effects across behavioral, cognitive, emotional, and health outcomes. ([PLOS ONE](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0306835))
+- **David et al. (2008)** — RCT with 170 patients: REBT matched both cognitive therapy and pharmacotherapy for major depressive disorder. ([Journal of Clinical Psychology](https://onlinelibrary.wiley.com/doi/abs/10.1002/jclp.20487))
+
+Demonstrated effective for depression, anxiety, PTSD, OCD, anger, substance use, and performance contexts.
+
+### How it works: the ABCDE model
+
+Every session walks you through five steps:
+
+| Step | What you do |
+|------|-------------|
+| **A** — Activating Event | Describe what happened |
+| **B** — Beliefs | Find the demands: must, should, have to |
+| **C** — Consequences | How you felt and acted |
+| **D** — Disputation | Challenge those beliefs with evidence |
+| **E** — Effective New Philosophy | Replace demands with preferences |
+
+The structured writing alone is therapeutic. The AI conversation that follows deepens it.
+
+---
 
 ## Features
 
-- **Guided REBT sessions** — Walk through the ABCDE model step by step
-- **AI conversation** — Socratic dialogue with a virtual REBT therapist (cloud or local)
-- **Long-term memory** — The AI remembers you across sessions and notices patterns
-- **Encrypted storage** — AES-256-GCM encryption for all journal entries
-- **Gamification** — Streaks, Stoic-themed levels, and fire animations
-- **Fully local-first** — No cloud services required
+### AI therapist that learns about you
+
+After each journal entry, you enter a Socratic dialogue with an AI trained in the Albert Ellis tradition — warm, direct, and curious. It asks questions rather than lectures. It challenges your "musts" and "shoulds" gently.
+
+The AI extracts memories from each session — personal details, recurring patterns, breakthroughs, themes — and carries them forward. By your tenth session, it knows your tendencies. By your thirtieth, it catches patterns you don't see yourself.
+
+### Local-first, encrypted by default
+
+All data lives in `~/.rationalizer/data.db`. Journal entries, conversations, and AI memories are encrypted with **AES-256-GCM** (PBKDF2 key derivation, 100k iterations, SHA-512). Your passphrase never leaves your machine.
+
+### Run any LLM
+
+| Provider | Privacy | Setup |
+|----------|---------|-------|
+| **Ollama** (local) | Nothing leaves your machine | `ollama pull llama3.2 && ollama serve` |
+| **Claude** (cloud) | Entries sent over HTTPS | Set `ANTHROPIC_API_KEY` |
+| **None** | Maximum privacy | Self-guided REBT only |
+
+### Vim mode
+
+Press `Ctrl+G` during any journal prompt to open your `$EDITOR`. Write long-form entries in vim, emacs, or whatever you use. The app picks up your text when you save and quit.
+
+### Stoic progression system
+
+A Greek-themed level system based on total journaling days, with streak tracking and animated celebrations:
+
+```
+○  Neophyte         →  The Beginner
+◎  Asketes          →  The Practitioner
+◈  Philosophos      →  Lover of Wisdom
+◇  Mathematikos     →  The Learner
+△  Dialektikos      →  Master of Reason
+⬡  Sophron          →  The Temperate One
+◆  Ataraxos         →  The Unshakeable
+✦  Sophos           →  The Sage
+★  Epistemon        →  The Knower
+```
+
+---
 
 ## Install
 
@@ -32,76 +96,22 @@ npm install -g rationalizer
 rationalizer
 ```
 
-Or run from source:
+From source:
 
 ```bash
-git clone <repo-url> && cd rationalizer
+git clone https://github.com/the-eigengrau/rationalizer.git
+cd rationalizer
 npm install
 npm run dev
 ```
 
-## AI Setup
-
-Rationalizer supports three modes:
-
-### Local AI (Ollama) — Free & Private
-
-Everything stays on your machine. Install [Ollama](https://ollama.ai), then:
-
-```bash
-brew install ollama
-ollama pull llama3.2
-ollama serve
-```
-
-The setup wizard will detect Ollama and configure it automatically.
-
-### Cloud AI (Claude) — More Capable
-
-Uses Claude Opus 4.6 via the Anthropic API. Get an API key at [console.anthropic.com](https://console.anthropic.com).
-
-Set it as an environment variable or enter it during setup:
-
-```bash
-export ANTHROPIC_API_KEY=sk-ant-...
-```
-
-### No AI
-
-Self-guided journaling only. The REBT questionnaire works perfectly on its own.
-
-## Encryption
-
-Your journal entries are encrypted with **AES-256-GCM**. On first run, you choose a passphrase — all sensitive data is encrypted before it hits the SQLite database.
-
-- **Cached mode** (default): Passphrase asked once, derived key cached for 1 hour
-- **Always mode**: Passphrase asked every session
-- **None**: Plaintext storage
-
-Data is stored at `~/.rationalizer/data.db`.
-
-## Level System
-
-A Stoic/Greek-themed progression system based on total active journaling days:
-
-| Days | Name | Title |
-|------|------|-------|
-| 0 | Neophyte | The Beginner |
-| 3 | Asketes | The Practitioner |
-| 7 | Philosophos | Lover of Wisdom |
-| 14 | Mathematikos | The Learner |
-| 30 | Dialektikos | Master of Reason |
-| 60 | Sophron | The Temperate One |
-| 90 | Ataraxos | The Unshakeable |
-| 180 | Sophos | The Sage |
-| 365 | Epistemon | The Knower |
+The setup wizard handles AI provider and encryption configuration on first run.
 
 ## Privacy
 
-- All data stored locally in `~/.rationalizer/`
-- With Ollama: nothing leaves your machine
-- With Anthropic: only journal content is sent to the API (encrypted at rest, sent over HTTPS)
-- No telemetry, no analytics, no tracking
+- **With Ollama**: Zero network traffic. Everything runs locally.
+- **With Claude**: Only journal content is sent to the Anthropic API over HTTPS. Encrypted at rest.
+- **No telemetry. No analytics. No tracking.**
 
 ## Development
 
@@ -109,7 +119,6 @@ A Stoic/Greek-themed progression system based on total active journaling days:
 npm run dev        # Run with tsx
 npm run build      # Compile TypeScript
 npm test           # Run tests
-npm run test:watch # Watch mode
 ```
 
 ## License

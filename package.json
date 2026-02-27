@@ -8,7 +8,7 @@
     "rationalizer": "./dist/index.js"
   },
   "scripts": {
-    "dev": "tsx src/index.ts",
+    "dev": "NODE_OPTIONS='--disable-warning=DEP0040' tsx src/index.ts",
     "build": "tsc",
     "test": "vitest run",
     "test:watch": "vitest"

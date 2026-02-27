@@ -2,7 +2,7 @@ import { select, password as passwordPrompt } from '@inquirer/prompts';
 import { loadConfig, configExists, readCachedKey, cacheKey, type Config } from './config/index.js';
 import { runSetupWizard } from './config/setup.js';
 import { getDb, closeDb } from './storage/database.js';
-import { setEncryptionKey, getStreakData as getDbStreakData } from './storage/index.js';
+import { setEncryptionKey } from './storage/index.js';
 import { deriveKey, verifySentinel } from './storage/encryption.js';
 import { animateParthenon } from './ui/ascii-art.js';
 import { displayStatus } from './gamification/index.js';
@@ -55,8 +55,14 @@ async function setupEncryption(config: Config): Promise<void> {
     }
   }
 
+  console.clear();
+  console.log();
+  console.log(colors.primary('  Rationalizer'));
+  console.log();
+
   const passphrase = await passwordPrompt({
-    message: 'Passphrase',
+    message: 'Enter your passphrase',
+    mask: '●',
     theme: promptTheme,
   });
 
@@ -87,6 +93,8 @@ async function mainMenuLoop(config: Config): Promise<void> {
   while (true) {
     if (!firstRun) {
       console.clear();
+      console.log();
+      await animateParthenon(config.preferences.animationsEnabled);
       console.log();
       displayStatus();
     }
@@ -126,25 +134,15 @@ async function mainMenuLoop(config: Config): Promise<void> {
 }
 
 async function runSession(config: Config): Promise<void> {
-  const beforeData = getDbStreakData();
-
   const entry = await runQuestionnaire();
 
   if (config.ai.provider !== 'none') {
     await runAISession(config, entry);
   }
 
-  const afterData = getDbStreakData();
-
   console.clear();
   console.log();
-  await animateSessionComplete({
-    beforeDays: beforeData.totalDays,
-    afterDays: afterData.totalDays,
-    beforeStreak: beforeData.currentStreak,
-    afterStreak: afterData.currentStreak,
-    animationsEnabled: config.preferences.animationsEnabled,
-  });
+  await animateSessionComplete(config.preferences.animationsEnabled);
 }
 
 async function typewriter(text: string, enabled: boolean): Promise<void> {
@@ -159,13 +157,15 @@ async function typewriter(text: string, enabled: boolean): Promise<void> {
 }
 
 async function showFarewell(config: Config): Promise<void> {
+  console.clear();
+  console.log();
+
   const recent = getRecentEntries(1);
   const entry = recent.length > 0 ? recent[0] : null;
 
   if (entry && config.ai.provider !== 'none') {
     const spinnerFrames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
     let frame = 0;
-    process.stdout.write('\n');
     const spinner = setInterval(() => {
       process.stdout.write(`\r  ${colors.dim(spinnerFrames[frame++ % spinnerFrames.length])}`);
     }, 80);
@@ -176,7 +176,7 @@ async function showFarewell(config: Config): Promise<void> {
     process.stdout.write('\r\x1b[2K');
 
     if (farewell) {
-      process.stdout.write('\n  ');
+      process.stdout.write('  ');
       await typewriter(farewell, config.preferences.animationsEnabled);
       process.stdout.write('\n\n');
       return;
@@ -185,7 +185,7 @@ async function showFarewell(config: Config): Promise<void> {
 
   // Fallback: random REBT tip
   const tip = getRandomTipRaw();
-  process.stdout.write('\n  ');
+  process.stdout.write('  ');
   await typewriter(tip, config.preferences.animationsEnabled);
   process.stdout.write('\n\n');
 }

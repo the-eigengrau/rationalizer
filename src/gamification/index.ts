@@ -19,8 +19,8 @@ export function displayStatus(): StreakData {
   // Single row: icon level  ━━━━━━━━━━━━━━━━  🔥 streak
   const streakNum = streakData.currentStreak;
   const fireSection = streakNum > 0
-    ? `${colors.primary('▲')} ${colors.white(String(streakNum))}`
-    : colors.subtle('▲ 0');
+    ? `🔥 ${colors.white(String(streakNum))}`
+    : colors.subtle('🔥 0');
 
   const line = `${colors.primary(current.icon)} ${colors.white(current.name)}  ${bar}  ${fireSection}`;
 

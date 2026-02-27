@@ -43,7 +43,10 @@ export async function vimInput(opts: VimInputOptions): Promise<string> {
           theme: inputTheme,
           validate: opts.validate,
           transformer: (value: string, { isFinal }: { isFinal: boolean }) => {
-            if (!value && !isFinal && !hasKeypress) return colors.subtle('ctrl+g for vim');
+            if (!value && !isFinal && !hasKeypress) {
+              const placeholder = 'ctrl+g for vim';
+              return colors.subtle(placeholder) + `\x1b[${placeholder.length}D`;
+            }
             return value;
           },
         },

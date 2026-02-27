@@ -5,6 +5,7 @@ export const promptTheme = {
   style: {
     message: (text: string) => colors.dimWhite(text),
     answer: (text: string) => colors.white(text),
+    highlight: (text: string) => colors.primary(text),
   },
   keybindings: ['vim' as const],
 };

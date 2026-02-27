@@ -67,12 +67,14 @@ export async function runSetupWizard(): Promise<Config> {
   if (encChoice !== 'none') {
     const passphrase = await password({
       message: 'Choose a passphrase',
+      mask: '●',
       theme: promptTheme,
       validate: (val) => val.length >= 8 || 'At least 8 characters.',
     });
 
     await password({
       message: 'Confirm passphrase',
+      mask: '●',
       theme: promptTheme,
       validate: (val) => val === passphrase || 'Passphrases do not match.',
     });

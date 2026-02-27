@@ -24,7 +24,7 @@ function startThinking(): { stop: () => void } {
     stop() {
       stopped = true;
       clearInterval(interval);
-      process.stdout.write('\r  ');
+      process.stdout.write('\r\x1b[2K');
     },
   };
 }
@@ -81,12 +81,12 @@ export async function runConversation(
 
   const getInput = (): Promise<string | null> => {
     return new Promise((resolve) => {
-      process.stdout.write(colors.dimWhite('\n\n  › '));
+      process.stdout.write(colors.dimWhite('\n  › '));
 
       const onLine = (line: string) => {
         // Overwrite the › prompt with "You" label
         process.stdout.write(`\x1b[1A\x1b[2K`);
-        process.stdout.write(`\n  ${colors.white('Me')}  ${line}\n`);
+        process.stdout.write(`  ${colors.dimWhite('Me')}\n  ${line}\n`);
         rl.removeListener('line', onLine);
         rl.removeListener('close', onClose);
         resolve(line);
@@ -153,7 +153,7 @@ async function streamResponse(
     fullResponse = await provider.chat(messages, systemPrompt, (text) => {
       if (firstToken) {
         thinking.stop();
-        process.stdout.write(`\n${colors.primary('Rationalizer')}\n${indent}`);
+        process.stdout.write(`\n  ${colors.dimWhite('Rationalizer')}\n  `);
         col = 0;
         firstToken = false;
       }

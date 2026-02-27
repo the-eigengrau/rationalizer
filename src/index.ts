@@ -1,15 +1,4 @@
-#!/usr/bin/env node
-
-// Suppress punycode deprecation warning from dependencies
-const originalEmit = process.emit;
-// @ts-expect-error -- patching process.emit to suppress dep warnings
-process.emit = function (event: string, ...args: unknown[]) {
-  if (event === 'warning' && typeof args[0] === 'object' && args[0] && (args[0] as { name?: string }).name === 'DeprecationWarning') {
-    return false;
-  }
-  // @ts-expect-error -- forwarding to original
-  return originalEmit.apply(process, [event, ...args]);
-};
+#!/usr/bin/env -S node --disable-warning=DEP0040
 
 import { main } from './cli.js';
 
