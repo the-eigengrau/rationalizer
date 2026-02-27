@@ -71,22 +71,6 @@ All data lives in `~/.rationalizer/data.db`. Journal entries, conversations, and
 
 Press `Ctrl+G` during any journal prompt to open your `$EDITOR`. Write long-form entries in vim, emacs, or whatever you use. The app picks up your text when you save and quit.
 
-### Stoic progression system
-
-A Greek-themed level system based on total journaling days, with streak tracking and animated celebrations:
-
-```
-○  Neophyte         →  The Beginner
-◎  Asketes          →  The Practitioner
-◈  Philosophos      →  Lover of Wisdom
-◇  Mathematikos     →  The Learner
-△  Dialektikos      →  Master of Reason
-⬡  Sophron          →  The Temperate One
-◆  Ataraxos         →  The Unshakeable
-✦  Sophos           →  The Sage
-★  Epistemon        →  The Knower
-```
-
 ---
 
 ## Install
