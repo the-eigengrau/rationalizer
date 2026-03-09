@@ -5,6 +5,7 @@ import { buildSystemPrompt, buildEntryMessage } from './prompt.js';
 import { loadMemories, loadRecentSummaries, extractAndSaveMemories } from './memory.js';
 import { saveConversation, generateId } from '../storage/index.js';
 import { colors } from '../ui/theme.js';
+import { wrapText } from '../ui/text.js';
 import { t } from '../i18n/index.js';
 
 const THINKING_FRAMES = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
@@ -30,36 +31,12 @@ function startThinking(): { stop: () => void } {
   };
 }
 
-function wrapText(text: string, width: number, indent: string): string {
-  const lines: string[] = [];
-  const paragraphs = text.split('\n');
-
-  for (const para of paragraphs) {
-    if (para.trim() === '') {
-      lines.push('');
-      continue;
-    }
-    const words = para.split(' ');
-    let currentLine = '';
-    for (const word of words) {
-      if (currentLine.length + word.length + 1 > width) {
-        lines.push(indent + currentLine);
-        currentLine = word;
-      } else {
-        currentLine = currentLine ? currentLine + ' ' + word : word;
-      }
-    }
-    if (currentLine) lines.push(indent + currentLine);
-  }
-  return lines.join('\n');
-}
-
 export async function runConversation(
   provider: AIProvider,
   entry: REBTEntry,
 ): Promise<void> {
   const memories = loadMemories();
-  const recentSummaries = loadRecentSummaries();
+  const recentSummaries = loadRecentSummaries(3, entry.id);
   const systemPrompt = buildSystemPrompt(memories, recentSummaries);
 
   const messages: ConversationMessage[] = [
@@ -85,9 +62,17 @@ export async function runConversation(
       process.stdout.write(colors.dimWhite('\n  › '));
 
       const onLine = (line: string) => {
-        // Overwrite the › prompt with "Me" label
-        process.stdout.write(`\x1b[1A\x1b[2K`);
-        process.stdout.write(`  ${colors.dimWhite(t().conversation.me)}\n  ${line}\n`);
+        // Clear all physical lines the echoed input occupied
+        const promptText = '  › ' + line;
+        const cols = process.stdout.columns || 80;
+        const physicalLines = Math.ceil(promptText.length / cols) || 1;
+        for (let i = 0; i < physicalLines; i++) {
+          process.stdout.write('\x1b[1A\x1b[2K');
+        }
+
+        // Write formatted "Me" message with word-wrap
+        const wrapped = wrapText(line, MAX_LINE_WIDTH, '  ');
+        process.stdout.write(`  ${colors.dimWhite(t().conversation.me)}\n${wrapped}\n`);
         rl.removeListener('line', onLine);
         rl.removeListener('close', onClose);
         resolve(line);

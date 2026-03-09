@@ -3,6 +3,7 @@ import boxen from 'boxen';
 import { listEntries, getConversation } from '../storage/index.js';
 import { colors, headerStyle, BOX_COLOR } from '../ui/theme.js';
 import { promptTheme } from '../ui/prompt-theme.js';
+import { showHelp } from '../ui/help.js';
 import { formatDate } from '../utils/date.js';
 import type { REBTEntry } from '../questionnaire/types.js';
 import { t } from '../i18n/index.js';
@@ -21,6 +22,7 @@ export async function viewPastEntries(): Promise<void> {
       name: `${colors.dim(formatDate(entry.createdAt))}  ${entry.emotionBefore}  ${colors.dim(`(${entry.emotionIntensity}/100)`)}`,
     }));
 
+    choices.push({ value: '__help', name: colors.dim('? Help') });
     choices.push({ value: '__back', name: colors.dim(t().common.back) });
 
     const chosen = await select({
@@ -30,6 +32,10 @@ export async function viewPastEntries(): Promise<void> {
       pageSize: 15,
     });
 
+    if (chosen === '__help') {
+      showHelp('pastEntries');
+      continue;
+    }
     if (chosen === '__back') return;
 
     const entry = entries.find(e => e.id === chosen);
@@ -62,7 +68,10 @@ function displayEntry(entry: REBTEntry): void {
     `${colors.white(t().entries.activatingEvent)}`,
     `${colors.dim(entry.activatingEvent)}`,
     '',
-    `${colors.white(t().entries.emotions)}  ${colors.dim(`${entry.emotionBefore} → ${entry.emotionAfter}`)}  ${colors.dim(`(${entry.emotionIntensity}/100)`)}`,
+    `${colors.white(t().entries.emotions)}  ${colors.dim(`${entry.emotionBefore}`)}  ${colors.dim(`(${entry.emotionIntensity}/100)`)}`,
+    '',
+    `${colors.white(t().entries.earlyWarningSigns)}`,
+    `${colors.dim(entry.earlyWarningSigns)}`,
     '',
     `${colors.white(t().entries.beliefs)}`,
     `${colors.dim(entry.beliefs)}`,
@@ -75,6 +84,9 @@ function displayEntry(entry: REBTEntry): void {
     '',
     `${colors.white(t().entries.newPhilosophy)}`,
     `${colors.dim(entry.effectiveNewPhilosophy)}`,
+    '',
+    `${colors.white(t().entries.motivation)}`,
+    `${colors.dim(entry.motivation)}`,
   ].join('\n');
 
   console.log();

@@ -1,5 +1,6 @@
 import { colors } from './theme.js';
 import { sleep } from '../utils/sleep.js';
+import { play, SoundEffect } from '../audio/index.js';
 
 const ANSI = {
   hideCursor: '\x1b[?25l',
@@ -224,6 +225,7 @@ export async function animateSessionComplete(animationsEnabled: boolean): Promis
     let lastBolt: LightningSegment[] = [];
 
     // === STORM PHASE (12 frames @ 85ms) ===
+    play(SoundEffect.Thunder);
     for (let frame = 0; frame < 12; frame++) {
       const canvas = createCanvas(height, width);
 
@@ -237,6 +239,7 @@ export async function animateSessionComplete(animationsEnabled: boolean): Promis
 
       // Lightning on frames 4 and 9
       if (frame === 4 || frame === 9) {
+        play(SoundEffect.Thunder);
         const cloudIdx = frame === 4 ? 0 : Math.min(1, clouds.length - 1);
         const cloud = clouds[cloudIdx];
         const lx = cloud.x + Math.floor(cloud.shape[0].length / 2);
@@ -271,6 +274,7 @@ export async function animateSessionComplete(animationsEnabled: boolean): Promis
     }
 
     // === CLEARING PHASE (8 frames @ 100ms) ===
+    play(SoundEffect.Clearing);
     for (let frame = 0; frame < 8; frame++) {
       const canvas = createCanvas(height, width);
 
@@ -304,6 +308,7 @@ export async function animateSessionComplete(animationsEnabled: boolean): Promis
     }
 
     // === SUNNY PHASE (18 frames @ 100ms) ===
+    play(SoundEffect.Sunny);
     // Sun centered on screen
     const sunMaxW = Math.max(...SUN_FRAME_1.map(l => l.length));
     const sunCol = Math.floor((width - sunMaxW) / 2);

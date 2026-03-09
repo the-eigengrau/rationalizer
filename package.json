@@ -8,12 +8,14 @@
     "rationalizer": "./dist/index.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "assets"
   ],
   "scripts": {
     "dev": "NODE_OPTIONS='--disable-warning=DEP0040' tsx src/index.ts",
     "build": "tsc",
     "prepublishOnly": "npm run build",
+    "generate-audio": "tsx scripts/generate-audio.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },

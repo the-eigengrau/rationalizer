@@ -32,7 +32,6 @@ export interface Translations {
     noAI: string;
     anthropicApiKey: string;
     ollamaModel: string;
-    ollamaUrl: string;
     encryption: string;
     encryptionMode: string;
     cached: string;
@@ -50,6 +49,15 @@ export interface Translations {
     preferences: string;
     enableAnimations: string;
     language: string;
+    audio: string;
+    audioOn: string;
+    audioOff: string;
+    audioStatus: { on: string; off: string };
+    startupMusic: string;
+    startupMusicAlways: string;
+    startupMusicDaily: string;
+    startupMusicNever: string;
+    seikilosBlurb: string;
     resetAllData: string;
     resetConfirm: string;
     dataCleared: string;
@@ -63,6 +71,8 @@ export interface Translations {
     consequences: string;
     disputation: string;
     newPhilosophy: string;
+    earlyWarningSigns: string;
+    motivation: string;
     conversation: string;
     you: string;
     rationalizer: string;
@@ -85,7 +95,8 @@ export interface Translations {
     consequences: { title: string; description: string; validation: string };
     disputation: { title: string; description: string; validation: string };
     newPhilosophy: { title: string; description: string; validation: string };
-    emotionAfter: { title: string; description: string; validation: string };
+    earlyWarningSigns: { title: string; description: string; validation: string };
+    motivation: { title: string; description: string; validation: string };
   };
 
   tips: string[];
@@ -120,8 +131,24 @@ export interface Translations {
       consequences: string;
       disputation: string;
       newPhilosophy: string;
-      emotionAfter: string;
+      earlyWarningSigns: string;
+      motivation: string;
     };
+  };
+
+  help: {
+    hint: string;
+    mainMenu: string;
+    pastEntries: string;
+    settings: string;
+    activatingEvent: string;
+    emotionBefore: string;
+    beliefs: string;
+    consequences: string;
+    disputation: string;
+    newPhilosophy: string;
+    earlyWarningSigns: string;
+    motivation: string;
   };
 
   levelUp: (name: string, title: string) => string;

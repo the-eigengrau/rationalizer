@@ -1,35 +1,52 @@
 import { select, input, password, confirm } from '@inquirer/prompts';
+import boxen from 'boxen';
 import { saveConfig, clearCachedKey, type Config } from '../config/index.js';
 import { getMemories, deleteMemory, deleteAllMemories, setEncryptionKey } from '../storage/index.js';
 import { getDb } from '../storage/database.js';
 import { generateSalt, deriveKey, createSentinel } from '../storage/encryption.js';
 import { cacheKey } from '../config/index.js';
-import { colors, headerStyle } from '../ui/theme.js';
+import { colors, headerStyle, BOX_COLOR } from '../ui/theme.js';
 import { promptTheme } from '../ui/prompt-theme.js';
+import { showHelp } from '../ui/help.js';
 import type { AIProvider, EncryptionMode } from '../questionnaire/types.js';
 import { t, setLanguage, getLanguageName } from '../i18n/index.js';
 import type { Language } from '../i18n/types.js';
+import { initAudio } from '../audio/index.js';
 
 export async function settingsMenu(config: Config): Promise<Config> {
   while (true) {
     console.clear();
     console.log();
-    const choice = await select({
-      message: '',
-      theme: { ...promptTheme, prefix: { idle: '', done: '' } },
-      choices: [
-        { value: 'back', name: colors.dim(t().common.back) },
-        { value: 'language', name: `${t().settings.language}  ${colors.dim(getLanguageName(config.preferences.language))}` },
-        { value: 'ai', name: `${t().settings.aiProvider}  ${colors.dim(config.ai.provider)}` },
-        { value: 'encryption', name: `${t().settings.encryption}  ${colors.dim(t().settings.encryptionStatus[config.encryption.mode])}` },
-        { value: 'memories', name: t().settings.memories },
-        { value: 'reset', name: colors.dim(t().settings.resetAllData) },
-      ],
-    });
+
+    let choice: string;
+    while (true) {
+      choice = await select({
+        message: '',
+        theme: { ...promptTheme, prefix: { idle: '', done: '' } },
+        choices: [
+          { value: 'back', name: colors.dim(t().common.back) },
+          { value: 'language', name: `${t().settings.language}  ${colors.dim(getLanguageName(config.preferences.language))}` },
+          { value: 'audio', name: `${t().settings.audio}  ${colors.dim(config.preferences.audioEnabled ? t().settings.audioStatus.on : t().settings.audioStatus.off)}` },
+          { value: 'ai', name: `${t().settings.aiProvider}  ${colors.dim(config.ai.provider)}` },
+          { value: 'encryption', name: `${t().settings.encryption}  ${colors.dim(t().settings.encryptionStatus[config.encryption.mode])}` },
+          { value: 'memories', name: t().settings.memories },
+          { value: 'reset', name: colors.dim(t().settings.resetAllData) },
+          { value: 'help', name: colors.dim('? Help') },
+        ],
+      });
+      if (choice === 'help') {
+        showHelp('settings');
+        continue;
+      }
+      break;
+    }
 
     switch (choice) {
       case 'language':
         config = await configureLanguage(config);
+        break;
+      case 'audio':
+        config = await configureAudio(config);
         break;
       case 'ai':
         config = await configureAI(config);
@@ -50,6 +67,9 @@ export async function settingsMenu(config: Config): Promise<Config> {
 }
 
 async function configureAI(config: Config): Promise<Config> {
+  console.clear();
+  console.log();
+
   const provider = await select<AIProvider>({
     message: '',
     theme: { ...promptTheme, prefix: { idle: '', done: '' } },
@@ -70,19 +90,25 @@ async function configureAI(config: Config): Promise<Config> {
     });
     config.ai.anthropicApiKey = apiKey;
   } else if (provider === 'ollama') {
-    const model = await input({
-      message: t().settings.ollamaModel,
-      theme: promptTheme,
-      default: config.ai.ollamaModel,
-    });
-    config.ai.ollamaModel = model;
-
-    const url = await input({
-      message: t().settings.ollamaUrl,
-      theme: promptTheme,
-      default: config.ai.ollamaUrl,
-    });
-    config.ai.ollamaUrl = url;
+    try {
+      const response = await fetch(`${config.ai.ollamaUrl}/api/tags`);
+      if (response.ok) {
+        const data = await response.json() as { models: Array<{ name: string }> };
+        if (data.models && data.models.length > 0) {
+          const modelChoice = await select({
+            message: t().settings.ollamaModel,
+            theme: promptTheme,
+            choices: data.models.map(m => ({ value: m.name, name: m.name })),
+            default: config.ai.ollamaModel,
+          });
+          config.ai.ollamaModel = modelChoice;
+        } else {
+          console.log(colors.dim('  No models found. Run: ollama pull llama3.2'));
+        }
+      }
+    } catch {
+      console.log(colors.dim('  Ollama not running. Start: ollama serve'));
+    }
   }
 
   saveConfig(config);
@@ -91,6 +117,9 @@ async function configureAI(config: Config): Promise<Config> {
 }
 
 async function configureEncryption(config: Config): Promise<Config> {
+  console.clear();
+  console.log();
+
   const mode = await select<EncryptionMode>({
     message: '',
     theme: { ...promptTheme, prefix: { idle: '', done: '' } },
@@ -145,7 +174,12 @@ async function manageMemories(): Promise<void> {
   const memories = getMemories(50);
 
   if (memories.length === 0) {
-    console.log(colors.dim(`\n  ${t().settings.noMemories}\n`));
+    console.log(colors.dim(`\n  ${t().settings.noMemories}`));
+    await select({
+      message: '',
+      theme: { ...promptTheme, prefix: { idle: '', done: '' } },
+      choices: [{ value: 'back', name: colors.dim(t().common.back) }],
+    });
     return;
   }
 
@@ -206,6 +240,9 @@ async function manageMemories(): Promise<void> {
 }
 
 async function configureLanguage(config: Config): Promise<Config> {
+  console.clear();
+  console.log();
+
   const language = await select<Language>({
     message: '',
     theme: { ...promptTheme, prefix: { idle: '', done: '' } },
@@ -220,6 +257,49 @@ async function configureLanguage(config: Config): Promise<Config> {
   config.preferences.language = language;
   setLanguage(language);
   saveConfig(config);
+  console.log(colors.dim(`  ${t().common.updated}`));
+  return config;
+}
+
+async function configureAudio(config: Config): Promise<Config> {
+  console.clear();
+  console.log();
+
+  console.log(boxen(colors.dim(t().settings.seikilosBlurb), {
+    padding: { top: 0, bottom: 0, left: 1, right: 1 },
+    borderColor: BOX_COLOR,
+    borderStyle: 'round',
+    dimBorder: true,
+  }));
+
+  const audioEnabled = await select<boolean>({
+    message: '',
+    theme: { ...promptTheme, prefix: { idle: '', done: '' } },
+    choices: [
+      { value: true, name: t().settings.audioOn },
+      { value: false, name: t().settings.audioOff },
+    ],
+    default: config.preferences.audioEnabled,
+  });
+
+  config.preferences.audioEnabled = audioEnabled;
+
+  if (audioEnabled) {
+    const startupMusic = await select<'always' | 'daily' | 'never'>({
+      message: t().settings.startupMusic,
+      theme: { ...promptTheme, prefix: { idle: '', done: '' } },
+      choices: [
+        { value: 'always' as const, name: t().settings.startupMusicAlways },
+        { value: 'daily' as const, name: t().settings.startupMusicDaily },
+        { value: 'never' as const, name: t().settings.startupMusicNever },
+      ],
+      default: config.preferences.startupMusic,
+    });
+    config.preferences.startupMusic = startupMusic;
+  }
+
+  saveConfig(config);
+  initAudio(config.preferences);
   console.log(colors.dim(`  ${t().common.updated}`));
   return config;
 }

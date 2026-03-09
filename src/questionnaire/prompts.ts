@@ -2,6 +2,7 @@ import { number } from '@inquirer/prompts';
 import { colors } from '../ui/theme.js';
 import { promptTheme } from '../ui/prompt-theme.js';
 import { vimInput } from '../ui/vim-input.js';
+import { wrapText } from '../ui/text.js';
 import { t } from '../i18n/index.js';
 
 export async function promptActivatingEvent(): Promise<string> {
@@ -10,6 +11,7 @@ export async function promptActivatingEvent(): Promise<string> {
 
   return vimInput({
     validate: (val) => val.trim().length > 0 || t().prompts.activatingEvent.validation,
+    helpKey: 'activatingEvent',
   });
 }
 
@@ -19,6 +21,7 @@ export async function promptEmotionBefore(): Promise<string> {
 
   return vimInput({
     validate: (val) => val.trim().length > 0 || t().prompts.emotionBefore.validation,
+    helpKey: 'emotionBefore',
   });
 }
 
@@ -42,6 +45,7 @@ export async function promptBeliefs(): Promise<string> {
 
   return vimInput({
     validate: (val) => val.trim().length > 0 || t().prompts.beliefs.validation,
+    helpKey: 'beliefs',
   });
 }
 
@@ -51,15 +55,23 @@ export async function promptConsequences(): Promise<string> {
 
   return vimInput({
     validate: (val) => val.trim().length > 0 || t().prompts.consequences.validation,
+    helpKey: 'consequences',
   });
 }
 
-export async function promptDisputation(): Promise<string> {
+export async function promptDisputation(beliefs: string): Promise<string> {
+  // Show beliefs recall block so user can see what they wrote
+  const wrapped = wrapText(beliefs, 68, '  ');
+  console.log(colors.dim(`\n  ${t().prompts.beliefs.title}`));
+  console.log(colors.dim('  ────────────'));
+  console.log(colors.dim(wrapped));
+
   console.log(colors.white(`\n  ${t().prompts.disputation.title}`));
   console.log(colors.dim(`  ${t().prompts.disputation.description}`));
 
   return vimInput({
     validate: (val) => val.trim().length > 0 || t().prompts.disputation.validation,
+    helpKey: 'disputation',
   });
 }
 
@@ -69,14 +81,26 @@ export async function promptEffectiveNewPhilosophy(): Promise<string> {
 
   return vimInput({
     validate: (val) => val.trim().length > 0 || t().prompts.newPhilosophy.validation,
+    helpKey: 'newPhilosophy',
   });
 }
 
-export async function promptEmotionAfter(): Promise<string> {
-  console.log(colors.white(`\n  ${t().prompts.emotionAfter.title}`));
-  console.log(colors.dim(`  ${t().prompts.emotionAfter.description}`));
+export async function promptEarlyWarningSigns(): Promise<string> {
+  console.log(colors.white(`\n  ${t().prompts.earlyWarningSigns.title}`));
+  console.log(colors.dim(`  ${t().prompts.earlyWarningSigns.description}`));
 
   return vimInput({
-    validate: (val) => val.trim().length > 0 || t().prompts.emotionAfter.validation,
+    validate: (val) => val.trim().length > 0 || t().prompts.earlyWarningSigns.validation,
+    helpKey: 'earlyWarningSigns',
+  });
+}
+
+export async function promptMotivation(): Promise<string> {
+  console.log(colors.white(`\n  ${t().prompts.motivation.title}`));
+  console.log(colors.dim(`  ${t().prompts.motivation.description}`));
+
+  return vimInput({
+    validate: (val) => val.trim().length > 0 || t().prompts.motivation.validation,
+    helpKey: 'motivation',
   });
 }

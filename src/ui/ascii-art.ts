@@ -2,35 +2,28 @@ import { sleep } from '../utils/sleep.js';
 import { colors } from './theme.js';
 import { t } from '../i18n/index.js';
 
-const COLUMN = `  .-----...-----.
- / .-._______.-. \\
- \\  \` /_____\\ \`  /
-  '--'| | | |'--'
-      | | | |
-      | | | |
-      | | | |
-      | | | |
-      | | | |
-      | | | |
-      |_|_|_|
-    _/_______\\_
-   |___________|`;
+const PARTHENON = `|     .-.
+|    /   \\         .-.
+|   /     \\       /   \\       .-.     .-.     _   _
++--/-------\\-----/-----\\-----/---\\---/---\\---/-\\-/-\\/\\/---
+| /         \\   /       \\   /     '-'     '-'
+|/           '-'         '-'`;
 
 export async function animateParthenon(enabled = true): Promise<void> {
   if (!enabled) {
-    console.log(colors.white(COLUMN));
+    console.log(colors.white(PARTHENON));
     return;
   }
 
-  const lines = COLUMN.split('\n');
+  const lines = PARTHENON.split('\n');
   for (const line of lines) {
     console.log(colors.white(line));
-    await sleep(60);
+    await sleep(80);
   }
 }
 
 export function getParthenon(): string {
-  return colors.white(COLUMN);
+  return colors.white(PARTHENON);
 }
 
 export async function animateLevelUp(levelName: string, title: string): Promise<void> {

@@ -2,10 +2,11 @@ import type { AIProvider } from './anthropic.js';
 import { createAnthropicProvider } from './anthropic.js';
 import { createOllamaProvider } from './ollama.js';
 import { runConversation } from './conversation.js';
-import { summarizeEntry } from './prompt.js';
+import { buildEntryMessage } from './prompt.js';
 import type { AppConfig } from '../questionnaire/types.js';
 import type { REBTEntry } from '../questionnaire/types.js';
 import { t } from '../i18n/index.js';
+import { getRandomTipRaw } from '../ui/tips.js';
 
 export function createProvider(config: AppConfig): AIProvider | null {
   switch (config.ai.provider) {
@@ -35,8 +36,22 @@ export async function generateFarewell(config: AppConfig, entry: REBTEntry): Pro
 
   const systemPrompt = t().ai.farewellSystemPrompt;
 
-  const summary = summarizeEntry(entry);
-  const userMessage = `Here's what they worked through today:\n\n${summary}\n\nGenerate the closing one-liner.`;
+  // Give the LLM the full entry so it can reference specifics
+  const entryContent = buildEntryMessage(entry);
+
+  // Pick a few tips as tonal inspiration
+  const tips = [getRandomTipRaw(), getRandomTipRaw(), getRandomTipRaw()];
+
+  const userMessage = `${entryContent}
+
+---
+
+Here are some aphorisms for tonal inspiration (do NOT copy these — use them only as a guide for voice and brevity):
+- ${tips[0]}
+- ${tips[1]}
+- ${tips[2]}
+
+Now write a single closing line for this person. Reference something specific from THEIR session — a word they used, the situation they described, the shift they made. Make them feel seen.`;
 
   try {
     let result = '';

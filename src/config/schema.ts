@@ -20,6 +20,8 @@ export const configSchema = z.object({
   preferences: z.object({
     animationsEnabled: z.boolean().default(true),
     language: z.enum(['en', 'la', 'grc']).default('en'),
+    audioEnabled: z.boolean().default(true),
+    startupMusic: z.enum(['always', 'daily', 'never']).default('always'),
   }),
 });
 

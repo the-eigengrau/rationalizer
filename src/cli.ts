@@ -1,5 +1,5 @@
 import { select, password as passwordPrompt } from '@inquirer/prompts';
-import { loadConfig, configExists, readCachedKey, cacheKey, type Config } from './config/index.js';
+import { loadConfig, configExists, readCachedKey, cacheKey, saveConfig, type Config } from './config/index.js';
 import { runSetupWizard } from './config/setup.js';
 import { getDb, closeDb } from './storage/database.js';
 import { setEncryptionKey } from './storage/index.js';
@@ -14,10 +14,11 @@ import { settingsMenu } from './screens/settings.js';
 import { colors } from './ui/theme.js';
 import { promptTheme } from './ui/prompt-theme.js';
 import { animateSessionComplete } from './ui/celebration.js';
-import { getRecentEntries } from './storage/index.js';
 import { getRandomTipRaw } from './ui/tips.js';
+import { showHelp } from './ui/help.js';
 import { sleep } from './utils/sleep.js';
 import { setLanguage, t } from './i18n/index.js';
+import { initAudio, play, stopAudio, SoundEffect, getStartupMode } from './audio/index.js';
 
 export async function main(): Promise<void> {
   let config: Config;
@@ -29,12 +30,17 @@ export async function main(): Promise<void> {
   }
 
   setLanguage(config.preferences.language);
+  initAudio(config.preferences);
   await setupEncryption(config);
   getDb();
 
   console.clear();
   console.log();
+  if (shouldPlayStartupMusic(config)) {
+    play(SoundEffect.Startup);
+  }
   await animateParthenon(config.preferences.animationsEnabled);
+
   console.log();
 
   displayStatus();
@@ -93,6 +99,7 @@ async function setupEncryption(config: Config): Promise<void> {
 
 async function mainMenuLoop(config: Config): Promise<void> {
   let firstRun = true;
+  let lastSessionEntry: import('./questionnaire/types.js').REBTEntry | null = null;
   while (true) {
     if (!firstRun) {
       console.clear();
@@ -103,22 +110,32 @@ async function mainMenuLoop(config: Config): Promise<void> {
     }
     firstRun = false;
 
-    console.log();
-    const choice = await select({
-      message: '',
-      theme: { ...promptTheme, prefix: { idle: '', done: '' } },
-      choices: [
-        { value: 'session', name: t().menu.beginSession },
-        { value: 'entries', name: t().menu.pastEntries },
-        { value: 'stats', name: t().menu.statsAndLevel },
-        { value: 'settings', name: t().menu.settings },
-        { value: 'exit', name: t().menu.exit },
-      ],
-    });
+    let choice: string;
+    while (true) {
+      console.log();
+      choice = await select({
+        message: '',
+        theme: { ...promptTheme, prefix: { idle: '', done: '' } },
+        choices: [
+          { value: 'session', name: t().menu.beginSession },
+          { value: 'entries', name: t().menu.pastEntries },
+          { value: 'stats', name: t().menu.statsAndLevel },
+          { value: 'settings', name: t().menu.settings },
+          { value: 'exit', name: t().menu.exit },
+          { value: 'help', name: colors.dim('? Help') },
+        ],
+      });
+      if (choice === 'help') {
+        showHelp('mainMenu');
+        continue;
+      }
+      play(SoundEffect.MenuSelect);
+      break;
+    }
 
     switch (choice) {
       case 'session':
-        await runSession(config);
+        lastSessionEntry = await runSession(config);
         break;
       case 'entries':
         await viewPastEntries();
@@ -130,13 +147,15 @@ async function mainMenuLoop(config: Config): Promise<void> {
         config = await settingsMenu(config);
         break;
       case 'exit':
-        await showFarewell(config);
+        stopAudio();
+        play(SoundEffect.Farewell);
+        await showFarewell(config, lastSessionEntry);
         return;
     }
   }
 }
 
-async function runSession(config: Config): Promise<void> {
+async function runSession(config: Config): Promise<import('./questionnaire/types.js').REBTEntry> {
   const entry = await runQuestionnaire();
 
   if (config.ai.provider !== 'none') {
@@ -146,6 +165,8 @@ async function runSession(config: Config): Promise<void> {
   console.clear();
   console.log();
   await animateSessionComplete(config.preferences.animationsEnabled);
+
+  return entry;
 }
 
 async function typewriter(text: string, enabled: boolean): Promise<void> {
@@ -159,21 +180,44 @@ async function typewriter(text: string, enabled: boolean): Promise<void> {
   }
 }
 
-async function showFarewell(config: Config): Promise<void> {
+function shouldPlayStartupMusic(config: Config): boolean {
+  const mode = getStartupMode();
+  if (mode === 'never') return false;
+  if (mode === 'always') return true;
+
+  // 'daily' — check if already played today
+  const today = new Date().toISOString().slice(0, 10);
+  const lastPlayed = (config as Record<string, unknown>).lastStartupMusicDate as string | undefined;
+  if (lastPlayed === today) return false;
+
+  // Record today's play (best-effort, non-critical)
+  try {
+    (config as Record<string, unknown>).lastStartupMusicDate = today;
+    saveConfig(config);
+  } catch {
+    // Non-critical
+  }
+  return true;
+}
+
+async function showFarewell(config: Config, sessionEntry: import('./questionnaire/types.js').REBTEntry | null): Promise<void> {
   console.clear();
   console.log();
 
-  const recent = getRecentEntries(1);
-  const entry = recent.length > 0 ? recent[0] : null;
+  // Only show a farewell line if the user actually journaled this run
+  if (!sessionEntry) {
+    console.log();
+    return;
+  }
 
-  if (entry && config.ai.provider !== 'none') {
+  if (config.ai.provider !== 'none') {
     const spinnerFrames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
     let frame = 0;
     const spinner = setInterval(() => {
       process.stdout.write(`\r  ${colors.dim(spinnerFrames[frame++ % spinnerFrames.length])}`);
     }, 80);
 
-    const farewell = await generateFarewell(config, entry);
+    const farewell = await generateFarewell(config, sessionEntry);
 
     clearInterval(spinner);
     process.stdout.write('\r\x1b[2K');
@@ -186,7 +230,7 @@ async function showFarewell(config: Config): Promise<void> {
     }
   }
 
-  // Fallback: random REBT tip
+  // Fallback: REBT tip (no-repeat rotation)
   const tip = getRandomTipRaw();
   process.stdout.write('  ');
   await typewriter(tip, config.preferences.animationsEnabled);

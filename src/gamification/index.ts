@@ -5,6 +5,7 @@ import { colors, BOX_COLOR } from '../ui/theme.js';
 import { animateLevelUp } from '../ui/ascii-art.js';
 import { getLevel } from './levels.js';
 import type { StreakData } from '../questionnaire/types.js';
+import { play, SoundEffect } from '../audio/index.js';
 
 export function displayStatus(): StreakData {
   const streakData = getStreakData();
@@ -39,6 +40,7 @@ export async function checkLevelUp(previousDays: number, currentDays: number): P
   const currLevel = getLevel(currentDays);
 
   if (currLevel.requiredDays > prevLevel.requiredDays) {
+    play(SoundEffect.LevelUp);
     await animateLevelUp(currLevel.name, currLevel.title);
   }
 }

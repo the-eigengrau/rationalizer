@@ -11,7 +11,8 @@ export interface REBTEntry {
   disputation: string;
   effectiveNewPhilosophy: string;
   emotionBefore: string;
-  emotionAfter: string;
+  earlyWarningSigns: string;
+  motivation: string;
 }
 
 export type REBTSensitiveData = Omit<REBTEntry, 'id' | 'createdAt' | 'dateKey' | 'emotionIntensity'>;

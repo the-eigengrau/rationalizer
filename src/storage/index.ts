@@ -69,7 +69,8 @@ export function saveEntry(entry: REBTEntry): void {
     disputation: entry.disputation,
     effectiveNewPhilosophy: entry.effectiveNewPhilosophy,
     emotionBefore: entry.emotionBefore,
-    emotionAfter: entry.emotionAfter,
+    earlyWarningSigns: entry.earlyWarningSigns,
+    motivation: entry.motivation,
   };
 
   const encrypted = encryptField(sensitive);

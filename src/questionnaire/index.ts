@@ -2,16 +2,16 @@ import {
   promptActivatingEvent,
   promptEmotionBefore,
   promptEmotionIntensity,
+  promptEarlyWarningSigns,
   promptBeliefs,
   promptConsequences,
   promptDisputation,
   promptEffectiveNewPhilosophy,
-  promptEmotionAfter,
+  promptMotivation,
 } from './prompts.js';
 import type { REBTEntry } from './types.js';
 import { generateId, saveEntry } from '../storage/index.js';
 import { todayKey } from '../utils/date.js';
-import { colors } from '../ui/theme.js';
 
 export async function runQuestionnaire(): Promise<REBTEntry> {
   console.clear();
@@ -19,11 +19,12 @@ export async function runQuestionnaire(): Promise<REBTEntry> {
   const activatingEvent = await promptActivatingEvent();
   const emotionBefore = await promptEmotionBefore();
   const emotionIntensity = await promptEmotionIntensity();
+  const earlyWarningSigns = await promptEarlyWarningSigns();
   const beliefs = await promptBeliefs();
   const consequences = await promptConsequences();
-  const disputation = await promptDisputation();
+  const disputation = await promptDisputation(beliefs);
   const effectiveNewPhilosophy = await promptEffectiveNewPhilosophy();
-  const emotionAfter = await promptEmotionAfter();
+  const motivation = await promptMotivation();
 
   const entry: REBTEntry = {
     id: generateId(),
@@ -36,7 +37,8 @@ export async function runQuestionnaire(): Promise<REBTEntry> {
     disputation,
     effectiveNewPhilosophy,
     emotionBefore,
-    emotionAfter,
+    earlyWarningSigns,
+    motivation,
   };
 
   saveEntry(entry);

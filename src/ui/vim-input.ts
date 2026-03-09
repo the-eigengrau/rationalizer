@@ -1,80 +1,226 @@
-import { input as inquirerInput } from '@inquirer/prompts';
 import { spawnSync } from 'node:child_process';
 import { writeFileSync, readFileSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { randomUUID } from 'node:crypto';
+import readline from 'node:readline';
 import { colors } from './theme.js';
-import { promptTheme } from './prompt-theme.js';
+import { showHelp } from './help.js';
+import { t } from '../i18n/index.js';
 
 interface VimInputOptions {
   message?: string;
   validate?: (value: string) => boolean | string;
+  helpKey?: string;
 }
 
-const inputTheme = {
-  ...promptTheme,
-  prefix: { idle: '  ›', done: '  ›' },
-};
+const PREFIX = '  › ';
+const INDENT = '    ';
+const PREFIX_WIDTH = 4;
+
+function rawInput(opts: VimInputOptions): Promise<string> {
+  return new Promise((resolve, reject) => {
+    let buffer = '';
+    let cursor = 0;
+    let lastCursorRow = 0;
+    let hasKeypress = false;
+    let errorMsg = '';
+    const wasRaw = process.stdin.isRaw;
+
+    readline.emitKeypressEvents(process.stdin);
+    if (process.stdin.isTTY) process.stdin.setRawMode(true);
+    process.stdin.resume();
+
+    function getLineCapacity(): number {
+      const cols = process.stdout.columns || 80;
+      return Math.max(cols - PREFIX_WIDTH - 1, 10);
+    }
+
+    function wrapBuffer(text: string, cap: number): string[] {
+      if (text.length === 0) return [''];
+      const lines: string[] = [];
+      for (let i = 0; i < text.length; i += cap) {
+        lines.push(text.slice(i, i + cap));
+      }
+      return lines;
+    }
+
+    function render() {
+      // Clear previous output
+      if (lastCursorRow > 0) {
+        process.stdout.write(`\x1b[${lastCursorRow}A`);
+      }
+      process.stdout.write('\r\x1b[J');
+
+      const cap = getLineCapacity();
+      const lines = wrapBuffer(buffer, cap);
+
+      // Ensure cursor has a rendered line to land on
+      const cursorRow = Math.floor(cursor / cap);
+      while (lines.length <= cursorRow) lines.push('');
+
+      // Build output
+      const hintText = !hasKeypress && buffer.length === 0
+        ? colors.subtle(`${opts.helpKey ? `${t().help.hint}  ` : ''}ctrl+g for vim`)
+        : '';
+
+      for (let i = 0; i < lines.length; i++) {
+        const prefix = i === 0 ? PREFIX : INDENT;
+        const lineText = lines[i];
+        if (i > 0) process.stdout.write('\n');
+        process.stdout.write(prefix + lineText);
+        if (i === 0 && hintText && buffer.length === 0) {
+          process.stdout.write(hintText);
+        }
+      }
+
+      if (errorMsg) {
+        process.stdout.write('\n' + INDENT + colors.error(errorMsg));
+      }
+
+      // Position cursor
+      const cursorCol = (cursor % cap) + PREFIX_WIDTH;
+      const totalLines = errorMsg ? lines.length + 1 : lines.length;
+      const lastLine = totalLines - 1;
+
+      // Move cursor up from bottom to cursorRow
+      const upMoves = lastLine - cursorRow;
+      if (upMoves > 0) {
+        process.stdout.write(`\x1b[${upMoves}A`);
+      }
+      process.stdout.write(`\r\x1b[${cursorCol}C`);
+      lastCursorRow = cursorRow;
+    }
+
+    function renderDone(answer: string) {
+      // Clear and show final state
+      if (lastCursorRow > 0) {
+        process.stdout.write(`\x1b[${lastCursorRow}A`);
+      }
+      process.stdout.write('\r\x1b[J');
+
+      const display = answer.includes('\n')
+        ? colors.white(answer.split('\n')[0]) + colors.dim(' ...')
+        : colors.white(answer);
+      process.stdout.write(PREFIX + display + '\n');
+    }
+
+    function cleanup() {
+      process.stdin.removeListener('keypress', onKeypress);
+      process.stdout.removeListener('resize', render);
+      if (process.stdin.isTTY) process.stdin.setRawMode(wasRaw ?? false);
+    }
+
+    function onKeypress(_ch: string | undefined, key: readline.Key | undefined) {
+      hasKeypress = true;
+      errorMsg = '';
+
+      if (key?.ctrl && key.name === 'c') {
+        cleanup();
+        // Clear the line and show nothing
+        if (lastCursorRow > 0) {
+          process.stdout.write(`\x1b[${lastCursorRow}A`);
+        }
+        process.stdout.write('\r\x1b[J');
+        reject(new Error('User cancelled'));
+        return;
+      }
+
+      if (key?.ctrl && key.name === 'g') {
+        cleanup();
+        // Clear current prompt
+        if (lastCursorRow > 0) {
+          process.stdout.write(`\x1b[${lastCursorRow}A`);
+        }
+        process.stdout.write('\r\x1b[J');
+        resolve('\x07CTRL_G');
+        return;
+      }
+
+      if (key?.name === 'return') {
+        // Validate
+        if (opts.validate) {
+          const result = opts.validate(buffer);
+          if (typeof result === 'string') {
+            errorMsg = result;
+            render();
+            return;
+          }
+        }
+        cleanup();
+        renderDone(buffer);
+        resolve(buffer);
+        return;
+      }
+
+      if (key?.name === 'backspace') {
+        if (cursor > 0) {
+          buffer = buffer.slice(0, cursor - 1) + buffer.slice(cursor);
+          cursor--;
+        }
+      } else if (key?.name === 'delete') {
+        if (cursor < buffer.length) {
+          buffer = buffer.slice(0, cursor) + buffer.slice(cursor + 1);
+        }
+      } else if (key?.name === 'left') {
+        if (cursor > 0) cursor--;
+      } else if (key?.name === 'right') {
+        if (cursor < buffer.length) cursor++;
+      } else if (key?.name === 'home' || (key?.ctrl && key.name === 'a')) {
+        cursor = 0;
+      } else if (key?.name === 'end' || (key?.ctrl && key.name === 'e')) {
+        cursor = buffer.length;
+      } else if (key?.ctrl && key.name === 'u') {
+        buffer = '';
+        cursor = 0;
+      } else if (_ch && !key?.ctrl && !key?.meta) {
+        // Printable character
+        buffer = buffer.slice(0, cursor) + _ch + buffer.slice(cursor);
+        cursor += _ch.length;
+      } else {
+        // Ignore other keys
+        return;
+      }
+
+      render();
+    }
+
+    process.stdin.on('keypress', onKeypress);
+    process.stdout.on('resize', render);
+
+    // Initial render
+    render();
+  });
+}
 
 export async function vimInput(opts: VimInputOptions): Promise<string> {
   while (true) {
-    let ctrlGDetected = false;
-    let hasKeypress = false;
-    const controller = new AbortController();
-
-    const onKeypress = (_ch: unknown, key: { ctrl?: boolean; name?: string } | undefined) => {
-      if (key?.ctrl && key?.name === 'g') {
-        ctrlGDetected = true;
-        controller.abort();
-      }
-    };
-
-    const onAnyKey = () => {
-      hasKeypress = true;
-    };
-
-    process.stdin.on('keypress', onKeypress);
-    process.stdin.on('keypress', onAnyKey);
-
     try {
-      const result = await inquirerInput(
-        {
-          message: opts.message || '',
-          theme: inputTheme,
-          validate: opts.validate,
-          transformer: (value: string, { isFinal }: { isFinal: boolean }) => {
-            if (!value && !isFinal && !hasKeypress) {
-              process.nextTick(() => {
-                const hint = 'ctrl+g for vim';
-                process.stdout.write(`${colors.subtle(hint)}\x1b[${hint.length}D`);
-              });
-              return '';
-            }
-            return value;
-          },
-        },
-        { signal: controller.signal },
-      );
-      process.stdin.removeListener('keypress', onKeypress);
-      process.stdin.removeListener('keypress', onAnyKey);
-      return result;
-    } catch (err) {
-      process.stdin.removeListener('keypress', onKeypress);
-      process.stdin.removeListener('keypress', onAnyKey);
+      const result = await rawInput(opts);
 
-      if (ctrlGDetected) {
-        // Clear the aborted prompt artifacts
-        process.stdout.write('\x1b[1A\x1b[2K\r');
-
+      if (result === '\x07CTRL_G') {
         const editorResult = openInEditor();
         if (editorResult.trim()) {
-          // Show what was entered via editor
-          console.log(`  › ${colors.white(editorResult.trim().split('\n')[0])}${editorResult.trim().includes('\n') ? colors.dim(' ...') : ''}`);
-          return editorResult.trim();
+          const trimmed = editorResult.trim();
+          const display = trimmed.includes('\n')
+            ? colors.white(trimmed.split('\n')[0]) + colors.dim(' ...')
+            : colors.white(trimmed);
+          console.log(`${PREFIX}${display}`);
+          return trimmed;
         }
         // Empty result, re-show prompt
         continue;
+      }
+
+      if (result.trim() === '/help' && opts.helpKey) {
+        showHelp(opts.helpKey);
+        continue;
+      }
+
+      return result;
+    } catch (err) {
+      if (err instanceof Error && err.message === 'User cancelled') {
+        process.exit(0);
       }
       throw err;
     }

@@ -7,9 +7,13 @@ export function loadMemories(limit = 30): Memory[] {
   return getMemories(limit);
 }
 
-export function loadRecentSummaries(limit = 3): string[] {
-  const entries = getRecentEntries(limit);
-  return entries.map(summarizeEntry);
+export function loadRecentSummaries(limit = 3, excludeEntryId?: string): string[] {
+  // Fetch one extra in case we need to filter out the current entry
+  let entries = getRecentEntries(limit + 1);
+  if (excludeEntryId) {
+    entries = entries.filter(e => e.id !== excludeEntryId);
+  }
+  return entries.slice(0, limit).map(summarizeEntry);
 }
 
 export async function extractAndSaveMemories(
